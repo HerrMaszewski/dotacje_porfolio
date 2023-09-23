@@ -6,9 +6,12 @@ from django.views.generic.edit import CreateView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic.edit import FormView
-from dotacje.models import Donation, Institution
+from dotacje.models import Donation, Institution, Category
 from .forms import RegistrationForm, LoginForm
 from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.shortcuts import get_object_or_404
 
 
 class LandingPage(View):
@@ -76,3 +79,29 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect('main-page')
+
+
+@method_decorator(login_required, name='dispatch')
+class UserProfileView(View):
+    template_name = 'user_profile.html'
+
+    def get(self, request):
+        user = request.user
+        context = {
+            'user': user,
+        }
+        return render(request, self.template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class FormView(View):
+    template_name = 'form.html'
+
+    def get(self, request):
+        categories = Category.objects.all()
+        institutions = Institution.objects.all()
+        context = {
+            'categories': categories,
+            'instytucje': institutions
+         }
+        return render(request, self.template_name, context)

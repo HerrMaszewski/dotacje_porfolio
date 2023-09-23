@@ -1,5 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block content %}
+   <header class="header--form-page">
+      <nav class="container container--70">
+      </nav>
+
+      <div class="slogan container container--90">
+        <div class="slogan--item">
+          <h1>
+            Oddaj rzeczy, których już nie chcesz<br />
+            <span class="uppercase">potrzebującym</span>
+          </h1>
+
+          <div class="slogan--steps">
+            <div class="slogan--steps-title">Wystarczą 4 proste kroki:</div>
+            <ul class="slogan--steps-boxes">
+              <li>
+                <div><em>1</em><span>Wybierz rzeczy</span></div>
+              </li>
+              <li>
+                <div><em>2</em><span>Spakuj je w worki</span></div>
+              </li>
+              <li>
+                <div><em>3</em><span>Wybierz fundację</span></div>
+              </li>
+              <li>
+                <div><em>4</em><span>Zamów kuriera</span></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+
 
 <section class="form--steps">
   <div class="form--steps-instructions">
@@ -29,55 +62,15 @@
       <div data-step="1" class="active">
         <h3>Zaznacz co chcesz oddać:</h3>
 
+        {% for category in categories %}
         <div class="form-group form-group--checkbox">
           <label>
-            <input
-              type="checkbox"
-              name="categories"
-              value="clothes-to-use"
-            />
+            <input type="checkbox" name="categories" value="{{ category.id }}" />
             <span class="checkbox"></span>
-            <span class="description"
-              >ubrania, które nadają się do ponownego użycia</span
-            >
+            <span class="description">{{ category.name }}</span>
           </label>
         </div>
-
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input
-              type="checkbox"
-              name="categories"
-              value="clothes-useless"
-            />
-            <span class="checkbox"></span>
-            <span class="description">ubrania, do wyrzucenia</span>
-          </label>
-        </div>
-
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input type="checkbox" name="categories" value="toys" />
-            <span class="checkbox"></span>
-            <span class="description">zabawki</span>
-          </label>
-        </div>
-
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input type="checkbox" name="categories" value="books" />
-            <span class="checkbox"></span>
-            <span class="description">książki</span>
-          </label>
-        </div>
-
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input type="checkbox" name="categories" value="other" />
-            <span class="checkbox"></span>
-            <span class="description">inne</span>
-          </label>
-        </div>
+        {% endfor %}
 
         <div class="form-group form-group--buttons">
           <button type="button" class="btn next-step">Dalej</button>
@@ -104,40 +97,27 @@
 
 
       <!-- STEP 4 -->
-      <div data-step="3">
-        <h3>Wybierz organizacje, której chcesz pomóc:</h3>
+    <div data-step="3">
+    <h3>Wybierz organizacje, której chcesz pomóc:</h3>
 
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input type="radio" name="organization" value="old" />
+    {% for institution in instytucje %}
+    <div class="form-group form-group--checkbox" data-kategorie="{{ institution.get_category_ids }}">
+        <label>
+            <input type="radio" name="organization" value="{{ institution.id }}" />
             <span class="checkbox radio"></span>
             <span class="description">
-              <div class="title">Fundacja “Bez domu”</div>
-              <div class="subtitle">
-                Cel i misja: Pomoc dla osób nie posiadających miejsca
-                zamieszkania
-              </div>
+                <div class="title">{{ institution.name }}</div>
+                <div class="subtitle">
+                    Cel i misja: {{ institution.description }}
+                </div>
             </span>
-          </label>
-        </div>
-
-        <div class="form-group form-group--checkbox">
-          <label>
-            <input type="radio" name="organization" value="old" />
-            <span class="checkbox radio"></span>
-            <span class="description">
-              <div class="title">Fundacja “Dla dzieci"</div>
-              <div class="subtitle">
-                Cel i misja: Pomoc osobom znajdującym się w trudnej sytuacji
-                życiowej.
-              </div>
-            </span>
-          </label>
-        </div>
+        </label>
+    </div>
+   {% endfor %}
 
         <div class="form-group form-group--buttons">
-          <button type="button" class="btn prev-step">Wstecz</button>
-          <button type="button" class="btn next-step">Dalej</button>
+            <button type="button" class="btn prev-step">Wstecz</button>
+            <button type="button" class="btn next-step">Dalej</button>
         </div>
       </div>
 
@@ -247,3 +227,4 @@
     </form>
   </div>
 </section>
+{% endblock %}

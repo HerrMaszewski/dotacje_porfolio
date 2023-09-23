@@ -186,6 +186,39 @@ document.addEventListener("DOMContentLoaded", function() {
     init() {
       this.events();
       this.updateForm();
+      this.setupCategoryFiltering();
+      this.filterOrganizacje();
+    }
+
+    /**
+     * Set up event listeners for category filtering
+     */
+    setupCategoryFiltering() {
+      let checkboxes = document.querySelectorAll("input[name='categories']");
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", this.filterOrganizacje.bind(this));  // Binding to maintain context.
+      });
+    }
+
+    /**
+     * Filter institutions based on selected categories
+     */
+    filterOrganizacje() {
+      let selectedCategories = [];
+      let checkboxes = document.querySelectorAll("input[name='categories']:checked");
+      checkboxes.forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+      });
+
+      let organizacje = document.querySelectorAll(".organizacja");
+      organizacje.forEach(organizacja => {
+        let kategorie = organizacja.getAttribute("data-kategorie").split(",");
+        if (selectedCategories.some(cat => kategorie.includes(cat))) {
+          organizacja.style.display = "block";
+        } else {
+          organizacja.style.display = "none";
+        }
+      });
     }
 
     /**
@@ -248,8 +281,10 @@ document.addEventListener("DOMContentLoaded", function() {
       this.updateForm();
     }
   }
+
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
   }
+
 });
