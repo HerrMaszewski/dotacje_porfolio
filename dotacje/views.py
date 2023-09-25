@@ -1,24 +1,25 @@
-from django.shortcuts import render, redirect
-from django.views import View
-from django.db.models import Sum
+
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView
-from django.contrib.auth.models import User
+
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic.edit import FormView
-from dotacje.models import Donation, Institution, Category
-from .forms import RegistrationForm, LoginForm
-from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.db.models import Sum
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.decorators import method_decorator
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
+from django.views import View
+from django.views.generic.edit import CreateView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+from dotacje.models import Donation, Institution, Category
+from .forms import LoginForm, RegistrationForm, DonationForm
 
 
 class GetData(View):
     def get(self, request):
         tab_type = request.GET.get('tab_type', 'Fundacje')
-        print("Received tab_type:", tab_type)  # Debugging line
+        print("Received tab_type:", tab_type)
 
         if tab_type == 'Fundacje':
             data = list(Institution.objects.filter(type='1').values())
@@ -29,7 +30,7 @@ class GetData(View):
         else:
             data = []
 
-        print("Data count:", len(data))  # Debugging line
+        print("Data count:", len(data))
         return JsonResponse(data, safe=False)
 
 
@@ -52,9 +53,39 @@ class LandingPage(View):
         return render(request, "index.html", context)
 
 
-class AddDonation(View):
+class AddDonationView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "add_donation.html")
+        categories = Category.objects.all()
+        institutions = Institution.objects.all()
+        form = DonationForm()
+        return render(request, 'form.html',
+                      {'categories': categories, 'institutions': institutions, 'form': form})
+
+    def post(self, request):
+        form = DonationForm(request.POST)
+        categories = request.POST['categories']
+        institution = request.POST['institution']
+        if form.is_valid():
+            quantity = form.cleaned_data['quantity']
+            address = form.cleaned_data['address']
+            city = form.cleaned_data['city']
+            zip_code = form.cleaned_data['zip_code']
+            phone_number = form.cleaned_data['phone_number']
+            pick_up_date = form.cleaned_data['pick_up_date']
+            pick_up_time = form.cleaned_data['pick_up_time']
+            pick_up_comment = form.cleaned_data['pick_up_comment']
+            user = request.user.id
+            donation = Donation.objects.create(quantity=quantity, institution_id=institution, address=address,
+                                               city=city, zip_code=zip_code, phone_number=phone_number,
+                                               pick_up_date=pick_up_date, pick_up_time=pick_up_time,
+                                               pick_up_comment=pick_up_comment, user_id=user)
+            donation.categories.add(categories)
+            return render(request, 'form-confirmation.html')
+        else:
+            categories = Category.objects.all()
+            institutions = Institution.objects.all()
+            return render(request, 'form.html',
+                          {'categories': categories, 'institutions': institutions, 'form': form})
 
 
 class LoginView(FormView):
@@ -114,18 +145,4 @@ class UserProfileView(View):
         context = {
             'user': user,
         }
-        return render(request, self.template_name, context)
-
-
-@method_decorator(login_required(login_url='login'), name='dispatch')
-class FormView(View):
-    template_name = 'form.html'
-
-    def get(self, request):
-        categories = Category.objects.all()
-        institutions = Institution.objects.all()
-        context = {
-            'categories': categories,
-            'instytucje': institutions
-         }
         return render(request, self.template_name, context)

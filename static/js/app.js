@@ -43,23 +43,6 @@ document.addEventListener("DOMContentLoaded", function() {
       [...this.$buttonsContainer.children].forEach(btn => btn.firstElementChild.classList.remove("active"));
       $btn.classList.add("active");
 
-      // Using jQuery to fetch new data based on tab_type
-            let tab_type = $btn.innerText.trim();
-            $.get("/get_data/", { tab_type: tab_type }, function(data) {
-              // console.log("data:",data)
-                let container = $(".help--slides.active .help--slides-items");
-                container.empty();
-                data.forEach(item => {
-                    let li = `<li>
-                                <div class="col">
-                                    <div class="title">${item.name}</div>
-                                    <div class="subtitle">${item.description}</div>
-                                </div>
-                              </li>`;
-                    container.append(li);
-                });
-            });
-
       // Current slide
       this.currentSlide = $btn.parentElement.dataset.id;
 
@@ -83,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function() {
       console.log(page);
     }
   }
+
   const helpSection = document.querySelector(".help");
   if (helpSection !== null) {
     new Help(helpSection);
@@ -153,6 +137,7 @@ document.addEventListener("DOMContentLoaded", function() {
       });
     }
   }
+
   document.querySelectorAll(".form-group--dropdown select").forEach(el => {
     new FormSelect(el);
   });
@@ -160,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function() {
   /**
    * Hide elements when clicked on document
    */
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     const target = e.target;
     const tagName = target.tagName;
 
@@ -179,94 +164,142 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  /**
-   * Switching between form steps
-   */
-  class FormSteps {
-    constructor(form) {
-      this.$form = form;
-      this.$next = form.querySelectorAll(".next-step");
-      this.$prev = form.querySelectorAll(".prev-step");
-      this.$step = form.querySelector(".form--steps-counter span");
-      this.currentStep = 1;
+    class FormSteps {
+        constructor(form) {
+            this.$form = form;
+            this.$next = form.querySelectorAll(".next-step");
+            this.$prev = form.querySelectorAll(".prev-step");
+            this.$step = form.querySelector(".form--steps-counter span");
+            this.currentStep = 1;
 
-      this.$stepInstructions = form.querySelectorAll(".form--steps-instructions p");
-      const $stepForms = form.querySelectorAll("form > div");
-      this.slides = [...this.$stepInstructions, ...$stepForms];
+            this.$stepInstructions = form.querySelectorAll(".form--steps-instructions p");
+            const $stepForms = form.querySelectorAll("form > div");
+            this.slides = [...this.$stepInstructions, ...$stepForms];
 
-      this.init();
-    }
-
-    /**
-     * Init all methods
-     */
-    init() {
-      this.events();
-      this.updateForm();
-    }
-
-    /**
-     * All events that are happening in form
-     */
-    events() {
-      // Next step
-      this.$next.forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.preventDefault();
-          this.currentStep++;
-          this.updateForm();
-        });
-      });
-
-      // Previous step
-      this.$prev.forEach(btn => {
-        btn.addEventListener("click", e => {
-          e.preventDefault();
-          this.currentStep--;
-          this.updateForm();
-        });
-      });
-
-      // Form submit
-      this.$form.querySelector("form").addEventListener("submit", e => this.submit(e));
-    }
-
-    /**
-     * Update form front-end
-     * Show next or previous section etc.
-     */
-    updateForm() {
-      this.$step.innerText = this.currentStep;
-
-      // TODO: Validation
-
-      this.slides.forEach(slide => {
-        slide.classList.remove("active");
-
-        if (slide.dataset.step == this.currentStep) {
-          slide.classList.add("active");
+            this.init();
         }
-      });
 
-      this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
-      this.$step.parentElement.hidden = this.currentStep >= 6;
+        /**
+         * Init all methods
+         */
+        init() {
+            this.events();
+            this.updateForm();
+        }
 
-      // TODO: get data from inputs and show them in summary
+        /**
+         * All events that are happening in form
+         */
+        events() {
+            // Next step
+            this.$next.forEach(btn => {
+                btn.addEventListener("click", e => {
+                    e.preventDefault();
+                    this.currentStep++;
+                    this.updateForm();
+                });
+            });
+
+            // Previous step
+            this.$prev.forEach(btn => {
+                btn.addEventListener("click", e => {
+                    e.preventDefault();
+                    this.currentStep--;
+                    this.updateForm();
+                });
+            });
+
+            // Form submit
+            this.$form.querySelector("form").addEventListener("submit", e => this.submit(e));
+        }
+
+        /**
+         * Update form front-end
+         * Show next or previous section etc.
+         */
+        updateForm() {
+            this.$step.innerText = this.currentStep;
+
+            // TODO: Validation
+
+            this.slides.forEach(slide => {
+                slide.classList.remove("active");
+
+                if (slide.dataset.step == this.currentStep) {
+                    slide.classList.add("active");
+                }
+            });
+
+            this.$stepInstructions[0].parentElement.parentElement.hidden = this.currentStep >= 6;
+            this.$step.parentElement.hidden = this.currentStep >= 6;
+
+            // TODO: get data from inputs and show them in summary
+        }
+
+        /**
+         * Submit form
+         *
+         * TODO: validation, send data to server
+         */
+        submit(e) {
+            // e.preventDefault();
+            this.currentStep++;
+            this.updateForm();
+        }
     }
 
-    /**
-     * Submit form
-     *
-     * TODO: validation, send data to server
-     */
-    submit(e) {
-      e.preventDefault();
-      this.currentStep++;
-      this.updateForm();
+    const form = document.querySelector(".form--steps");
+    if (form !== null) {
+        new FormSteps(form);
     }
-  }
-  const form = document.querySelector(".form--steps");
-  if (form !== null) {
-    new FormSteps(form);
-  }
+
+    // filtering organizations based on category
+    let categories = document.getElementsByName("categories");
+    for (let i = 0; i < categories.length; i++) {
+        categories[i].addEventListener("change", (e) => {
+            if (e.target.checked) {
+                let category = e.target.value;
+                let institutions = document.getElementsByName("institution");
+
+                for (let j = 0; j < institutions.length; j++) {
+                    if (!institutions[j].classList.contains(category)) {
+                        institutions[j].parentElement.parentElement.style.display = "none";
+                    } else {
+                        institutions[j].parentElement.parentElement.style.display = "block";
+
+                    }
+                }
+
+            }
+        });
+    }
+
+    //form summary
+    let final_btn = document.getElementById('final-btn');
+    final_btn.addEventListener("click", event => {
+        let category = $("input[name='categories']:checked").next().next().text();
+        let quantity = $("input[name='quantity']").val();
+        let institution = $("input[name='institution']:checked").next().next().children('.title').text();
+        let address = $("input[name='address']").val();
+        let city = $("input[name='city']").val();
+        let zip_code = $("input[name='zip_code']").val();
+        let phone_number = $("input[name='phone_number']").val();
+        let pick_up_date = $("input[name='pick_up_date']").val();
+        let pick_up_time = $("input[name='pick_up_time']").val();
+        let pick_up_comment = $("textarea[name='pick_up_comment']").val();
+
+        let sacks = `${quantity} worków ${category}`;
+        let inst = `Dla ${institution}`;
+        $("#sacks_sum").text(sacks);
+        $("#inst_sum").text(inst);
+        $("#address").text(address);
+        $("#city").text(city);
+        $("#zip_code").text(zip_code);
+        $("#phone_number").text(phone_number);
+        $("#pick_up_date").text(pick_up_date);
+        $("#pick_up_time").text(pick_up_time);
+        $("#pick_up_comment").text(pick_up_comment);
+
+
+    })
 });
