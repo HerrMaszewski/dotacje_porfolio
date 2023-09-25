@@ -10,7 +10,7 @@
                         <li><a href="#">Ustawienia</a></li>
                         <li><a href="{% url 'logout' %}">Wyloguj</a></li>
                         {% if request.user.is_superuser %}
-                        <li><a href="" class="btn btn--without-border">Panel Administracyjny</a></li>
+                        <li><a href="#" class="btn btn--without-border">Panel Administracyjny</a></li>
 {                       {% endif %}
                     </ul>
                 </li>
@@ -27,23 +27,23 @@
             <li><a href="{% url 'main-page' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>
             <li><a href="{% url 'main-page' %}#about-us" class="btn btn--without-border">O nas</a></li>
             <li><a href="{% url 'main-page' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
-            <li><a href="{% url 'form' %}" class="btn btn--without-border">Przekaż dary</a></li>
+            <li><a href="{% url 'add-donation' %}" class="btn btn--without-border">Przekaż dary</a></li>
             <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
         </ul>
     </nav>
 </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var userElement = document.querySelector('.logged-user');
-    var dropdownElement = document.querySelector('.logged-user .dropdown');
+<!--<script>-->
+<!--document.addEventListener("DOMContentLoaded", function() {-->
+<!--    var userElement = document.querySelector('.logged-user');-->
+<!--    var dropdownElement = document.querySelector('.logged-user .dropdown');-->
 
-    userElement.addEventListener('mouseover', function() {
-        dropdownElement.style.display = 'block';
-    });
+<!--    userElement.addEventListener('mouseover', function() {-->
+<!--        dropdownElement.style.display = 'block';-->
+<!--    });-->
 
-    userElement.addEventListener('mouseout', function() {
-        dropdownElement.style.display = 'none';
-    });
-});
-</script>
+<!--    userElement.addEventListener('mouseout', function() {-->
+<!--        dropdownElement.style.display = 'none';-->
+<!--    });-->
+<!--});-->
+<!--</script>-->
