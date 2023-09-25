@@ -12,15 +12,41 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+
+
+class GetData(View):
+    def get(self, request):
+        tab_type = request.GET.get('tab_type', 'Fundacje')
+        print("Received tab_type:", tab_type)  # Debugging line
+
+        if tab_type == 'Fundacje':
+            data = list(Institution.objects.filter(type='1').values())
+        elif tab_type == 'Organizacje pozarządowe':
+            data = list(Institution.objects.filter(type='2').values())
+        elif tab_type == 'Lokalne zbiórki':
+            data = list(Institution.objects.filter(type='3').values())
+        else:
+            data = []
+
+        print("Data count:", len(data))  # Debugging line
+        return JsonResponse(data, safe=False)
 
 
 class LandingPage(View):
     def get(self, request):
         donated_bags = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags'] or 0
         number_of_institutions = Institution.objects.all().count()
+
+        active_tab = request.GET.get('tab', 'Fundacja')
+
         context = {
             'bags': donated_bags,
-            'no_institutions': number_of_institutions
+            'no_institutions': number_of_institutions,
+            'active_tab': active_tab,
+            'Fundacja': Institution.objects.filter(type='1'),
+            'Organizacja_pozarządowa': Institution.objects.filter(type='2'),
+            'Lokalna_zbiórka': Institution.objects.filter(type='3'),
         }
 
         return render(request, "index.html", context)
@@ -64,8 +90,6 @@ class RegistrationView(CreateView):
     def form_valid(self, form):
         email = form.cleaned_data.get('email')
         password = form.cleaned_data.get('password')
-
-        # Set the username to the email and hash the password
         form.instance.username = email
         form.instance.set_password(password)
 
@@ -93,7 +117,7 @@ class UserProfileView(View):
         return render(request, self.template_name, context)
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(login_url='login'), name='dispatch')
 class FormView(View):
     template_name = 'form.html'
 

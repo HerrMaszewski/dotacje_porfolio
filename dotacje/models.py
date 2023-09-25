@@ -10,9 +10,15 @@ class Category(models.Model):
 
 
 class Institution(models.Model):
+    TYPE_CHOICES = (
+        ('1', 'Fundacja'),
+        ('2', 'Organizacja pozarządowa'),
+        ('3', 'Lokalna zbiórka'),
+    )
+
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
-    type = models.CharField(max_length=25, default="1")
+    type = models.CharField(max_length=25, choices=TYPE_CHOICES, default="1")
     categories = models.ManyToManyField(Category)
 
     def get_category_ids(self):

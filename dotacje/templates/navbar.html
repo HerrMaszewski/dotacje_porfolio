@@ -10,7 +10,7 @@
                         <li><a href="#">Ustawienia</a></li>
                         <li><a href="{% url 'logout' %}">Wyloguj</a></li>
                         {% if request.user.is_superuser %}
-                        <li><a href="" class="btn btn--without-border">Panel Administracyjny</a></li>
+                        <li><a href="#" class="btn btn--without-border">Panel Administracyjny</a></li>
 {                       {% endif %}
                     </ul>
                 </li>
@@ -33,17 +33,17 @@
     </nav>
 </header>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    var userElement = document.querySelector('.logged-user');
-    var dropdownElement = document.querySelector('.logged-user .dropdown');
+<!--<script>-->
+<!--document.addEventListener("DOMContentLoaded", function() {-->
+<!--    var userElement = document.querySelector('.logged-user');-->
+<!--    var dropdownElement = document.querySelector('.logged-user .dropdown');-->
 
-    userElement.addEventListener('mouseover', function() {
-        dropdownElement.style.display = 'block';
-    });
+<!--    userElement.addEventListener('mouseover', function() {-->
+<!--        dropdownElement.style.display = 'block';-->
+<!--    });-->
 
-    userElement.addEventListener('mouseout', function() {
-        dropdownElement.style.display = 'none';
-    });
-});
-</script>
+<!--    userElement.addEventListener('mouseout', function() {-->
+<!--        dropdownElement.style.display = 'none';-->
+<!--    });-->
+<!--});-->
+<!--</script>-->

@@ -43,6 +43,23 @@ document.addEventListener("DOMContentLoaded", function() {
       [...this.$buttonsContainer.children].forEach(btn => btn.firstElementChild.classList.remove("active"));
       $btn.classList.add("active");
 
+      // Using jQuery to fetch new data based on tab_type
+            let tab_type = $btn.innerText.trim();
+            $.get("/get_data/", { tab_type: tab_type }, function(data) {
+              // console.log("data:",data)
+                let container = $(".help--slides.active .help--slides-items");
+                container.empty();
+                data.forEach(item => {
+                    let li = `<li>
+                                <div class="col">
+                                    <div class="title">${item.name}</div>
+                                    <div class="subtitle">${item.description}</div>
+                                </div>
+                              </li>`;
+                    container.append(li);
+                });
+            });
+
       // Current slide
       this.currentSlide = $btn.parentElement.dataset.id;
 
@@ -186,39 +203,6 @@ document.addEventListener("DOMContentLoaded", function() {
     init() {
       this.events();
       this.updateForm();
-      this.setupCategoryFiltering();
-      this.filterOrganizacje();
-    }
-
-    /**
-     * Set up event listeners for category filtering
-     */
-    setupCategoryFiltering() {
-      let checkboxes = document.querySelectorAll("input[name='categories']");
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", this.filterOrganizacje.bind(this));  // Binding to maintain context.
-      });
-    }
-
-    /**
-     * Filter institutions based on selected categories
-     */
-    filterOrganizacje() {
-      let selectedCategories = [];
-      let checkboxes = document.querySelectorAll("input[name='categories']:checked");
-      checkboxes.forEach(checkbox => {
-        selectedCategories.push(checkbox.value);
-      });
-
-      let organizacje = document.querySelectorAll(".organizacja");
-      organizacje.forEach(organizacja => {
-        let kategorie = organizacja.getAttribute("data-kategorie").split(",");
-        if (selectedCategories.some(cat => kategorie.includes(cat))) {
-          organizacja.style.display = "block";
-        } else {
-          organizacja.style.display = "none";
-        }
-      });
     }
 
     /**
@@ -281,10 +265,8 @@ document.addEventListener("DOMContentLoaded", function() {
       this.updateForm();
     }
   }
-
   const form = document.querySelector(".form--steps");
   if (form !== null) {
     new FormSteps(form);
   }
-
 });
