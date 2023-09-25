@@ -34,23 +34,26 @@ class GetData(View):
         return JsonResponse(data, safe=False)
 
 
-class LandingPage(View):
+class LandingPageView(View):
     def get(self, request):
-        donated_bags = Donation.objects.aggregate(total_bags=Sum('quantity'))['total_bags'] or 0
-        number_of_institutions = Institution.objects.all().count()
+        bags = 0
+        institutions = []
+        donations = Donation.objects.all()
 
-        active_tab = request.GET.get('tab', 'Fundacja')
+        for donation in donations:
+            bags += donation.quantity
+            if donation.institution.name not in institutions:
+                institutions.append(donation.institution.name)
+        institutions = len(institutions)
 
-        context = {
-            'bags': donated_bags,
-            'no_institutions': number_of_institutions,
-            'active_tab': active_tab,
-            'Fundacja': Institution.objects.filter(type='1'),
-            'Organizacja_pozarządowa': Institution.objects.filter(type='2'),
-            'Lokalna_zbiórka': Institution.objects.filter(type='3'),
-        }
+        foundations = Institution.objects.filter(type=1)
+        organizations = Institution.objects.filter(type=2)
+        local_collections = Institution.objects.filter(type=3)
 
-        return render(request, "index.html", context)
+        return render(request, 'index.html',
+                      {'bags': bags, 'institutions': institutions,
+                       'foundations': foundations, 'organizations': organizations,
+                       'local_collections': local_collections})
 
 
 class AddDonationView(LoginRequiredMixin, View):
