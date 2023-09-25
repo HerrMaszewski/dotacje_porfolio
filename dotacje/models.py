@@ -5,12 +5,18 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Institution(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(null=True, blank=True)
     type = models.CharField(max_length=25, default="1")
     categories = models.ManyToManyField(Category)
+
+    def get_category_ids(self):
+        return ",".join([str(category.id) for category in self.categories.all()])
 
     def __str__(self):
         return self.name

@@ -1,13 +1,17 @@
 <header>
     <nav class="container container--70">
+
         {% if request.user.is_authenticated %}
             <ul class="nav--actions">
                 <li class="logged-user">
                     Witaj {{ request.user.first_name }}
                     <ul class="dropdown">
-                        <li><a href="#">Profil</a></li>
+                        <li><a href="{% url 'user-profile' %}">Profil</a></li>
                         <li><a href="#">Ustawienia</a></li>
                         <li><a href="{% url 'logout' %}">Wyloguj</a></li>
+                        {% if request.user.is_superuser %}
+                        <li><a href="" class="btn btn--without-border">Panel Administracyjny</a></li>
+{                       {% endif %}
                     </ul>
                 </li>
             </ul>
@@ -23,6 +27,7 @@
             <li><a href="{% url 'main-page' %}#steps" class="btn btn--without-border">O co chodzi?</a></li>
             <li><a href="{% url 'main-page' %}#about-us" class="btn btn--without-border">O nas</a></li>
             <li><a href="{% url 'main-page' %}#help" class="btn btn--without-border">Fundacje i organizacje</a></li>
+            <li><a href="{% url 'form' %}" class="btn btn--without-border">Przekaż dary</a></li>
             <li><a href="#contact" class="btn btn--without-border">Kontakt</a></li>
         </ul>
     </nav>
